@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^add$', 'acorta.views.add'),
     url(r'(^\d+)$', 'acorta.views.redirect'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'.*', 'acorta.views.notbe'),
 ]
