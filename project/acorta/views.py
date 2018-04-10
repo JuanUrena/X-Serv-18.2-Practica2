@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from urllib.parse import unquote
+from urllib.parse import urlsplit
 
 from acorta.models import Url
 
@@ -37,7 +38,11 @@ def process_url(url):
     return url
 @csrf_exempt
 def add(request):
+    url=Url(url=process_url(request.POST['URL']))
+    url.save()
+    return HttpResponse("Has enviado " + url.url)
     
-    return HttpResponse("Has enviado " + request.POST['URL'])
+def redirect(request, code):
+    
 
     
