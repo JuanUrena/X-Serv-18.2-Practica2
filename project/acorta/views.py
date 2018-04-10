@@ -20,6 +20,9 @@ URL que quiere guardar:<br>
 <input type="submit" value="Enviar">
 </form>
 """
+HOMEPAGE="""
+<a href=/>Pagina Principal </a>
+"""
 @csrf_exempt
 def mainpage(request):
     if request.method=='GET':
@@ -28,16 +31,22 @@ def mainpage(request):
         for url in data:
             resp += '<li><a href=' + str(url.id) + '>/'+ str(url.id)+ '</a>. ' + url.url
         resp += '</ul>'
-        html = '<html><body><h1>Bienvenido al menu</h1>' + resp + FORMULARIO + '</body></html>'
+        html = '<html><body><h1>Bienvenido al Acortador de URLs</h1>' + resp + FORMULARIO + '</body></html>'
         return HttpResponse(html)
     elif request.method=='POST':
         try:
-            urlre=Url(url=process_url(request.POST['URL']))
-            urlre.save()
-            return HttpResponse("<html><body>Has enviado: " + urlre.url +'</br> Esta en la dirección: <a href=' + str(urlre.id) + '>http://localhost:1234/'+str(urlre.id)+' </a></body></html>')
+            page=request.POST['URL']
+            if page!="":
+                urlre=Url(url=process_url(request.POST['URL']))
+                urlre.save()
+                return HttpResponse("<html><body>Has enviado: " + urlre.url +'</br> Esta en la dirección: <a href=' + str(urlre.id) + '>http://localhost:8000/'+str(urlre.id)+' </a></br>'+HOMEPAGE+'</body></html>')
+            else:
+                return HttpResponse('<html><body>Campo invalido </br>'+HOMEPAGE+'</body></html>')
         except IntegrityError:
             url=Url.objects.get(url=process_url(request.POST['URL']))
-            return HttpResponse('<html><body>Ya estaba en la lista la Url, se encuentra en la dirección: <a href=' + str(url.id) + '>http://localhost:1234/'+str(url.id)+' </a></body></html>')
+            return HttpResponse('<html><body>Ya estaba en la lista la Url, se encuentra en la dirección: <a href=' + str(url.id) + '>http://localhost:8000/'+str(url.id)+' </a></br>'+HOMEPAGE+'</body></html>')
+    else:
+        HttpResponseNotFound("<html><body><h1>No se ha encontrado el metodo para ese recurso</h1>"+HOMEPAGE+"</body></html>")
     
     
 def request_to_url(request):
@@ -57,10 +66,10 @@ def redirect(request, code):
         print(data)
         return HttpResponseRedirect(data)
     except Url.DoesNotExist: 
-        return HttpResponseNotFound("<html><body><h1>No se ha encontrado</h1></body></html>")
+        return HttpResponseNotFound("<html><body><h1>No se ha encontrado</h1></br>"+HOMEPAGE+"</body></html>")
         
 def notbe(request):
-       return HttpResponseNotFound("<html><body><h1>No se ha encontrado</h1></body></html>")
+       return HttpResponseNotFound("<html><body><h1>No se ha encontrado</h1></br>"+HOMEPAGE+"</body></html>")
     
 
     
